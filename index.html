@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- This stylesheet contains specific styles for displaying the map
+         on this page. Replace it with your own styles as described in the
+         documentation:
+         https://developers.google.com/maps/documentation/javascript/tutorial -->
+   <style type="text/css">
+      html, body { height: 100%; margin: 0; padding: 0; }
+      #map { position: absolute;top: 64px;bottom: 0;left: 0;right: 0}
+      .labels {
+  color: white;
+  text-align: center;
+  width: 30px;
+  font-weight: bold;
+  white-space: nowrap;
+  margin-top: -45px!important;
+    }
+    .brand-logo{
+      margin: 10px;
+    }
+    .switch{
+      margin-right: 70px;
+      margin-top: -10px;
+    }
+    </style>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/css/materialize.min.css">
+        <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <script   src="https://code.jquery.com/jquery-2.2.4.min.js"   integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="   crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
+
+     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD9I1RNT5oMCV6953hI44am3wV7r-lRfiU"
+    ></script>
+    <script src="https://cdn.rawgit.com/googlemaps/v3-utility-library/master/markerwithlabel/src/markerwithlabel.js" ></script>
+  </head>
+  <body onload="">
+
+    <nav>
+    <div class="nav-wrapper cyan darken-2">
+      <a href="#!" class="brand-logo right"><img src="http://vignette3.wikia.nocookie.net/youtubepoop/images/4/4c/Pokeball.png/revision/latest?cb=20150418234807" alt="" width="40"></a>
+      <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
+     
+      <div class="switch right ">
+    <label>
+      
+      <input type="checkbox" id="polylineToggle" class="orange darken-1" checked="true">
+      <span class="lever cyan lighten-4 cyan-text text-lighten-4">Lineas</span>
+      
+    </label>
+  </div>
+      <ul class="left hide-on-med-and-down nav-content">
+        
+       
+      </ul>
+      <ul class="side-nav nav-content" id="mobile-demo">
+        
+      </ul>
+    </div>
+  </nav>
+          
+    <div id="map"></div>
+    <script>
+    $(document).ready(function(){
+        var locations = ["Home","Tajamar","Kabah","Forum","LaIsla","UCaribe","RIU"]
+        var menu_html = ''
+        for(var i = 0; i<locations.length;i++){
+          menu_html = menu_html+'<li><a href="'+locations[i]+'" class="menu-btn">'+locations[i]+'</a></li>';
+        }
+        $(".nav-content").html(menu_html);
+
+        $(".button-collapse").sideNav();
+        $(".menu-btn").click(function(e){
+          e.preventDefault();
+          var file = "spawnpoints_"+$(this).attr("href")+".json";
+
+          $.getJSON(file, function(json) {
+          initMap(json);
+
+        });
+        })
+      $.getJSON("spawnpoints_home.json", function(json) {
+        initMap(json);
+      });
+
+
+    })
+
+      function initMap(json) {
+        
+        
+        var spawnpoints = json;
+
+        
+
+        spawnpoints.sort(function(a, b){
+            var keyA = a.time,
+                keyB = b.time;
+            // Compare the 2 dates
+            if(keyA < keyB) return -1;
+            if(keyA > keyB) return 1;
+            return 0;
+        });
+
+        var myLatLng = {lat: spawnpoints[0].lat, lng: spawnpoints[0].lng};
+
+        // Create a map object and specify the DOM element for display.
+        var map = new google.maps.Map(document.getElementById('map'), {
+          center: myLatLng,
+          scrollwheel: false,
+          zoom: 17
+        });
+        var lineSymbol = {
+          // path: 'M 0,-1 0,1',
+          // strokeOpacity: 1,
+          // scale: 4
+          path: google.maps.SymbolPath.FORWARD_OPEN_ARROW
+        };
+        var customSymbol = {
+          //path: 'M30.148 5.588c-2.934-3.42-7.288-5.588-12.148-5.588-8.837 0-16 7.163-16 16s7.163 16 16 16c4.86 0 9.213-2.167 12.148-5.588l-10.148-10.412 10.148-10.412zM22 3.769c1.232 0 2.231 0.999 2.231 2.231s-0.999 2.231-2.231 2.231-2.231-0.999-2.231-2.231c0-1.232 0.999-2.231 2.231-2.231z',
+          //path: 'M17 32c-0.072 0-0.144-0.008-0.217-0.024-0.458-0.102-0.783-0.507-0.783-0.976v-15h-15c-0.469 0-0.875-0.326-0.976-0.783s0.129-0.925 0.553-1.123l30-14c0.381-0.178 0.833-0.098 1.13 0.199s0.377 0.749 0.199 1.13l-14 30c-0.167 0.358-0.524 0.577-0.906 0.577zM5.508 14h11.492c0.552 0 1 0.448 1 1v11.492l10.931-23.423-23.423 10.931z',
+          path: google.maps.SymbolPath.CIRCLE,
+          scale: 8,
+          //fillColor:'#80D8FF',
+          //strokeColor:'#0091EA',
+          fillColor:'#b2ebf2',
+          strokeColor:'#0097a7',
+          fillOpacity:1
+        }
+
+        var huntPath = new google.maps.Polyline({
+          path: spawnpoints,
+          geodesic: true,
+          strokeColor: '#000',
+          strokeOpacity: 1,
+          strokeWeight: 3,
+          draggable:false,
+          icons:[{
+              icon:lineSymbol,
+                offset:'0',
+                repeat:'150px'
+              },
+              {
+                icon:customSymbol,
+                offset:'0',
+
+              }
+          ]
+            
+          
+        });
+
+       
+
+
+        // poly = new google.maps.Polyline({
+        //   strokeColor: '#000000',
+        //   strokeOpacity: 1.0,
+        //   strokeWeight: 3
+        // });
+        // poly.setMap(map);
+
+        // // Add a listener for the click event
+        // map.addListener('click', addLatLng);
+
+
+
+
+        console.log(spawnpoints.length)
+        for (var i = 0; i < spawnpoints.length; i++){
+          var time  = String(spawnpoints[i].time/60)
+          time = Math.round(time)
+          var coords = {lat:spawnpoints[i].lat,lng:spawnpoints[i].lng}
+          var marker = new MarkerWithLabel({
+            map: map,
+            position: coords,
+            //label: time,
+            //title: time,
+            labelContent: time,
+    labelAnchor: new google.maps.Point(15, 65),
+    labelClass: "labels", // the CSS class for the label
+    labelInBackground: false,
+    icon: "marker-icon.png"
+          });
+        }
+
+         huntPath.setMap(map);
+
+        animateCircle(huntPath);
+
+        $("#polylineToggle").on('change', function(event) {
+        
+        var checked = this.checked;
+    
+        huntPath.setVisible(checked);
+    
+      });
+        
+      }
+     function pinSymbol(color) {
+  return {
+    path: 'M 0,0 C -2,-20 -10,-22 -10,-30 A 10,10 0 1,1 10,-30 C 10,-22 2,-20 0,0 z',
+    fillColor: color,
+    fillOpacity: 1,
+    strokeColor: '#000',
+    strokeWeight: 2,
+    scale: 2
+  };
+}
+
+function animateCircle(line) {
+    var count = 0;
+    window.setInterval(function() {
+      count = (count + 1) % 200;
+
+      var icons = line.get('icons');
+      icons[1].offset = (count / 2) + '%';
+      line.set('icons', icons);
+  }, 200);
+}
+
+
+// // Handles click events on a map, and adds a new point to the Polyline.
+// function addLatLng(event) {
+//   var path = poly.getPath();
+
+//   // Because path is an MVCArray, we can simply append a new coordinate
+//   // and it will automatically appear.
+//   path.push(event.latLng);
+
+//   // Add a new marker at the new plotted point on the polyline.
+  
+// }
+
+    </script>
+   
+    
+  </body>
+</html>
