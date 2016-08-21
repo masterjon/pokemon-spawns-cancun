@@ -122,8 +122,9 @@
         // Create a map object and specify the DOM element for display.
         var map = new google.maps.Map(document.getElementById('map'), {
           center: myLatLng,
-          scrollwheel: false,
-          zoom: 17
+          scrollwheel: true,
+          zoom: 17,
+          rotateControl:true
         });
         var lineSymbol = {
           // path: 'M 0,-1 0,1',
@@ -142,6 +143,8 @@
           strokeColor:'#0097a7',
           fillOpacity:1
         }
+
+
 
         var huntPath = new google.maps.Polyline({
           path: spawnpoints,
@@ -210,6 +213,22 @@
         huntPath.setVisible(checked);
     
       });
+
+
+        var myloc = new google.maps.Marker({
+            clickable: false,
+            icon: 'man-icon.png',
+            shadow: null,
+            zIndex: 999,
+            map: map
+        });
+
+        if (navigator.geolocation) navigator.geolocation.getCurrentPosition(function(pos) {
+            var me = new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude);
+            myloc.setPosition(me);
+        }, function(error) {
+            // ...
+        }); 
         
       }
      function pinSymbol(color) {
@@ -233,6 +252,8 @@ function animateCircle(line) {
       line.set('icons', icons);
   }, 200);
 }
+
+
 
 
 // // Handles click events on a map, and adds a new point to the Polyline.
