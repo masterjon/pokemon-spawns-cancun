@@ -23,6 +23,18 @@
       margin-right: 70px;
       margin-top: -10px;
     }
+    .brand-logo {
+      border-radius: 50%;
+      -webkit-transition: -webkit-transform .8s ease-in-out;
+      transition: transform 1s ease-in-out;
+    }
+    .brand-logo:hover {
+      -webkit-transform: rotate(1080deg);
+      transform: rotate(1080deg);
+    }
+    .nav-wrapper{
+      z-index: 400;
+    }
     </style>
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/css/materialize.min.css">
         <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -36,7 +48,7 @@
   </head>
   <body onload="">
 
-    <nav>
+    <nav >
     <div class="nav-wrapper cyan darken-2">
       <a href="#!" class="brand-logo right"><img src="http://vignette3.wikia.nocookie.net/youtubepoop/images/4/4c/Pokeball.png/revision/latest?cb=20150418234807" alt="" width="40"></a>
       <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
